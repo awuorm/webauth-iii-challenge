@@ -1,4 +1,5 @@
 const jwt = require("jsonwebtoken");
+const db = require("../usersModel");
 
 function restricted(req, res, next) {
   const token = req.headers.authorization;
@@ -15,5 +16,7 @@ function restricted(req, res, next) {
     res.status(400).json({ message: "No credentials provided" });
   }
 }
+
+
 
 module.exports = restricted;

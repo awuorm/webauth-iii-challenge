@@ -9,10 +9,14 @@ router.get("/users", restricted, handleAllUsersGet);
 router.get("/users/:id", restricted, handleUsersGetById);
 
 function handleUsersGetById(req, res) {
-  db.findById(req.params.id)
+  db.findById(req.params.id, req.decodedToken.roles)
     .then(data => {
-      res.status(200).json(data);
-      console.table(data);
+      if (data === undefined) {
+        res.status(404).json({ errorMessaga: "Please provide a valid ID!" });
+      } else {
+        res.status(200).json(data);
+        console.table(data);
+      }
     })
     .catch(error => {
       res.status(500).json({ errorMessage: error });
@@ -20,22 +24,14 @@ function handleUsersGetById(req, res) {
 }
 
 function handleAllUsersGet(req, res) {
-  if (req.decodedToken.roles === "management") {
-    db.find()
-      .then(data => {
-        res.status(200).json(data);
-        console.table(data);
-      })
-      .catch(error => {
-        res.status(500).json({ errorMessage: error });
-      });
-  } else {
-    res
-      .status(403)
-      .json({
-        info: "Please reach out to management to access these records!"
-      });
-  }
+  db.find(req.decodedToken.roles)
+    .then(data => {
+      res.status(200).json(data);
+      console.table(data);
+    })
+    .catch(error => {
+      res.status(500).json({ errorMessage: error });
+    });
 }
 
 module.exports = router;
