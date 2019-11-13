@@ -20,14 +20,22 @@ function handleUsersGetById(req, res) {
 }
 
 function handleAllUsersGet(req, res) {
-  db.find()
-    .then(data => {
-      res.status(200).json(data);
-      console.table(data);
-    })
-    .catch(error => {
-      res.status(500).json({ errorMessage: error });
-    });
+  if (req.decodedToken.roles === "management") {
+    db.find()
+      .then(data => {
+        res.status(200).json(data);
+        console.table(data);
+      })
+      .catch(error => {
+        res.status(500).json({ errorMessage: error });
+      });
+  } else {
+    res
+      .status(403)
+      .json({
+        info: "Please reach out to management to access these records!"
+      });
+  }
 }
 
 module.exports = router;
